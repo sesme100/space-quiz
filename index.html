@@ -385,6 +385,33 @@
       background: var(--purple);
     }
 
+    .shuffle-option {
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+
+    .shuffle-option label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .shuffle-option input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex-shrink: 0;
+      accent-color: var(--purple);
+    }
+
+    .shuffle-option p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .category {
       display: inline-flex;
       gap: 7px;
@@ -481,6 +508,37 @@
       font-weight: 800;
       font-size: 11px;
       white-space: nowrap;
+    }
+
+    .hint-area {
+      margin-top: 15px;
+    }
+
+    .hint-toggle {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1.5px solid #e4e3eb;
+      border-radius: 10px;
+      background: white;
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .hint-toggle:hover {
+      border-color: var(--purple);
+      background: #f7f4ff;
+    }
+
+    .hint-panel {
+      margin: 8px 0 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f1edfc;
+      font-size: 12px;
+      overflow-wrap: anywhere;
     }
 
     .feedback {
@@ -939,10 +997,20 @@
           <progress id="progress" value="0" max="10" aria-label="완료한 문제" aria-valuetext="10문제 중 0문제 완료">0 /
             10</progress>
           <div id="question-screen">
+            <div class="shuffle-option">
+              <label for="shuffle-toggle"><input type="checkbox" id="shuffle-toggle" aria-describedby="shuffle-note">
+                문제 순서 섞기</label>
+              <p id="shuffle-note">첫 답변 전에만 바꿀 수 있어요. 다시 시작해도 선택한 설정은 유지돼요.</p>
+            </div>
             <span class="category" id="category"></span>
             <h2 id="question" tabindex="-1"></h2>
             <p class="helper" id="answer-help">정답이라고 생각하는 답 하나를 골라 주세요.</p>
             <div class="answers" id="answers" role="group" aria-labelledby="question" aria-describedby="answer-help">
+            </div>
+            <div class="hint-area" id="hint-area">
+              <button type="button" class="hint-toggle" id="hint-toggle" aria-expanded="false"
+                aria-controls="hint-panel">루미의 힌트 보기</button>
+              <p class="hint-panel" id="hint-panel" role="region" aria-label="루미의 힌트" hidden></p>
             </div>
             <div class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true"></div>
             <div class="card-bottom"><span class="tip">✧ 서두르지 않아도 괜찮아요.</span><button class="primary" id="next"
@@ -976,16 +1044,16 @@
   <script>
     "use strict";
     const questions = [
-      { category: "☀ 태양계", question: "태양계에서 가장 큰 행성은 무엇일까요?", options: ["지구", "토성", "목성", "해왕성"], answer: 2, explanation: "목성은 태양계에서 가장 큰 행성이에요. 지름이 지구의 약 11배나 된답니다!" },
-      { category: "☾ 달 탐사", question: "인류가 처음 달에 발을 디딘 해는 언제일까요?", options: ["1957년", "1969년", "1981년", "2000년"], answer: 1, explanation: "1969년 아폴로 11호의 닐 암스트롱과 버즈 올드린이 달 표면을 걸었어요." },
-      { category: "✧ 행성 탐험", question: "‘붉은 행성’이라는 별명을 가진 행성은?", options: ["금성", "수성", "천왕성", "화성"], answer: 3, explanation: "화성 표면에는 산화 철, 즉 녹 성분이 많아서 붉게 보여요." },
-      { category: "☀ 별의 비밀", question: "태양은 어떤 종류의 천체일까요?", options: ["스스로 빛을 내는 별", "빛을 반사하는 행성", "행성 주위를 도는 위성", "얼음과 먼지로 된 혜성"], answer: 0, explanation: "태양은 중심에서 일어나는 핵융합으로 에너지를 만드는 별, 즉 항성이에요." },
-      { category: "◎ 지구와 달", question: "달에서 몸무게는 지구에서의 약 몇 분의 1일까요?", options: ["2분의 1", "6분의 1", "같아요", "100분의 1"], answer: 1, explanation: "달 표면의 중력은 지구의 약 6분의 1이에요. 몸무게는 줄어도 몸의 질량은 변하지 않아요." },
-      { category: "✦ 우주 관측", question: "빛이 1년 동안 이동하는 ‘거리’를 뜻하는 말은?", options: ["천문단위", "킬로그램", "광년", "광속"], answer: 2, explanation: "광년은 시간이 아니라 거리 단위예요. 1광년은 약 9조 4,600억 km랍니다." },
-      { category: "◉ 행성의 고리", question: "크고 밝은 고리로 특히 유명한 행성은?", options: ["화성", "금성", "수성", "토성"], answer: 3, explanation: "토성의 고리는 수많은 얼음 조각과 암석으로 이루어져 있어요. 다른 거대 행성에도 고리가 있답니다." },
-      { category: "↗ 우주 생활", question: "국제우주정거장에서 우주인이 떠다니는 주된 이유는?", options: ["정거장과 함께 지구 주위를 계속 자유 낙하해서", "우주에는 중력이 전혀 없어서", "우주복이 몸을 위로 당겨서", "정거장에 공기가 없어서"], answer: 0, explanation: "우주정거장에도 지구의 중력이 작용해요. 정거장과 우주인이 함께 지구 주위를 자유 낙하하며 무중력처럼 느끼는 거예요." },
-      { category: "✧ 우리 은하", question: "태양계가 속한 은하의 이름은 무엇일까요?", options: ["안드로메다 은하", "소용돌이 은하", "우리은하", "삼각형자리 은하"], answer: 2, explanation: "태양계는 우리은하에 속해 있어요. 밤하늘의 은하수는 우리은하의 수많은 별이 모여 보이는 모습이에요." },
-      { category: "☀ 마지막 미션", question: "태양에 가장 가까운 행성은 무엇일까요?", options: ["금성", "수성", "지구", "목성"], answer: 1, explanation: "태양에 가장 가까운 행성은 수성이에요. 하지만 평균 표면 온도가 가장 높은 행성은 강한 온실 효과를 가진 금성이랍니다." }
+      { category: "☀ 태양계", question: "태양계에서 가장 큰 행성은 무엇일까요?", options: ["지구", "토성", "목성", "해왕성"], answer: 2, hint: "커다란 붉은 소용돌이 무늬를 가진 거대한 가스 행성이에요.", explanation: "목성은 태양계에서 가장 큰 행성이에요. 지름이 지구의 약 11배나 된답니다!" },
+      { category: "☾ 달 탐사", question: "인류가 처음 달에 발을 디딘 해는 언제일까요?", options: ["1957년", "1969년", "1981년", "2000년"], answer: 1, hint: "아폴로 11호의 달 착륙은 1960년대 후반에 이루어졌어요.", explanation: "1969년 아폴로 11호의 닐 암스트롱과 버즈 올드린이 달 표면을 걸었어요." },
+      { category: "✧ 행성 탐험", question: "‘붉은 행성’이라는 별명을 가진 행성은?", options: ["금성", "수성", "천왕성", "화성"], answer: 3, hint: "지구 바로 바깥 궤도를 돌며, 탐사 로버들이 표면을 살펴보고 있어요.", explanation: "화성 표면에는 산화 철, 즉 녹 성분이 많아서 붉게 보여요." },
+      { category: "☀ 별의 비밀", question: "태양은 어떤 종류의 천체일까요?", options: ["스스로 빛을 내는 별", "빛을 반사하는 행성", "행성 주위를 도는 위성", "얼음과 먼지로 된 혜성"], answer: 0, hint: "지구에 보내 주는 빛과 열의 에너지가 어디에서 생겨나는지 생각해 보세요.", explanation: "태양은 중심에서 일어나는 핵융합으로 에너지를 만드는 별, 즉 항성이에요." },
+      { category: "◎ 지구와 달", question: "달에서 몸무게는 지구에서의 약 몇 분의 1일까요?", options: ["2분의 1", "6분의 1", "같아요", "100분의 1"], answer: 1, hint: "지구에서 몸무게가 60kg인 탐험가는 달에서 약 10kg으로 측정돼요.", explanation: "달 표면의 중력은 지구의 약 6분의 1이에요. 몸무게는 줄어도 몸의 질량은 변하지 않아요." },
+      { category: "✦ 우주 관측", question: "빛이 1년 동안 이동하는 ‘거리’를 뜻하는 말은?", options: ["천문단위", "킬로그램", "광년", "광속"], answer: 2, hint: "시간처럼 들려도, 멀리 떨어진 별까지의 간격을 나타낼 때 쓰는 말이에요.", explanation: "광년은 시간이 아니라 거리 단위예요. 1광년은 약 9조 4,600억 km랍니다." },
+      { category: "◉ 행성의 고리", question: "크고 밝은 고리로 특히 유명한 행성은?", options: ["화성", "금성", "수성", "토성"], answer: 3, hint: "태양에서 여섯 번째에 있는 거대한 가스 행성이에요.", explanation: "토성의 고리는 수많은 얼음 조각과 암석으로 이루어져 있어요. 다른 거대 행성에도 고리가 있답니다." },
+      { category: "↗ 우주 생활", question: "국제우주정거장에서 우주인이 떠다니는 주된 이유는?", options: ["정거장과 함께 지구 주위를 계속 자유 낙하해서", "우주에는 중력이 전혀 없어서", "우주복이 몸을 위로 당겨서", "정거장에 공기가 없어서"], answer: 0, hint: "정거장에도 지구의 중력이 닿고 있어요. 정거장과 우주인의 움직임을 함께 생각해 보세요.", explanation: "우주정거장에도 지구의 중력이 작용해요. 정거장과 우주인이 함께 지구 주위를 자유 낙하하며 무중력처럼 느끼는 거예요." },
+      { category: "✧ 우리 은하", question: "태양계가 속한 은하의 이름은 무엇일까요?", options: ["안드로메다 은하", "소용돌이 은하", "우리은하", "삼각형자리 은하"], answer: 2, hint: "밤하늘에 길게 흐르는 은하수는 우리가 속한 거대한 별 무리의 일부예요.", explanation: "태양계는 우리은하에 속해 있어요. 밤하늘의 은하수는 우리은하의 수많은 별이 모여 보이는 모습이에요." },
+      { category: "☀ 마지막 미션", question: "태양에 가장 가까운 행성은 무엇일까요?", options: ["금성", "수성", "지구", "목성"], answer: 1, hint: "태양을 한 바퀴 도는 데 지구의 시간으로 약 88일이 걸리는 작은 행성이에요.", explanation: "태양에 가장 가까운 행성은 수성이에요. 하지만 평균 표면 온도가 가장 높은 행성은 강한 온실 효과를 가진 금성이랍니다." }
     ];
     const ui = {
       counter: document.getElementById("counter"), score: document.getElementById("score"),
@@ -993,13 +1061,32 @@
       question: document.getElementById("question"), answers: document.getElementById("answers"),
       feedback: document.getElementById("feedback"), next: document.getElementById("next"),
       questionScreen: document.getElementById("question-screen"), results: document.getElementById("results"),
-      partner: document.getElementById("partner-message")
+      partner: document.getElementById("partner-message"),
+      shuffle: document.getElementById("shuffle-toggle"), shuffleNote: document.getElementById("shuffle-note"),
+      hintArea: document.getElementById("hint-area"), hintToggle: document.getElementById("hint-toggle"),
+      hintPanel: document.getElementById("hint-panel")
     };
     let current = 0;
     let score = 0;
     let selections = [];
+    let questionOrder = [...questions];
+    function createQuestionOrder() {
+      const order = [...questions];
+      if (ui.shuffle.checked) {
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+      }
+      return order;
+    }
+    function collapseHint() {
+      ui.hintToggle.setAttribute("aria-expanded", "false");
+      ui.hintToggle.textContent = "루미의 힌트 보기";
+      ui.hintPanel.hidden = true;
+    }
     function renderQuestion(moveFocus = false) {
-      const item = questions[current];
+      const item = questionOrder[current];
       ui.counter.replaceChildren();
       const number = document.createElement("strong");
       number.textContent = String(current + 1).padStart(2, "0");
@@ -1010,6 +1097,9 @@
       ui.answers.replaceChildren();
       ui.next.disabled = true;
       ui.next.textContent = current === questions.length - 1 ? "탐험 결과 보기 →" : "다음 미션 →";
+      collapseHint();
+      ui.hintArea.hidden = false;
+      ui.hintPanel.textContent = item.hint;
       item.options.forEach((option, index) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -1028,8 +1118,12 @@
     }
     function selectAnswer(index) {
       if (selections.length > current) return;
-      const item = questions[current];
+      const item = questionOrder[current];
       selections.push(index);
+      ui.shuffle.disabled = true;
+      ui.shuffleNote.textContent = "이번 탐험의 순서 설정은 잠겼어요. 다시 시작하면 바꿀 수 있어요.";
+      ui.hintArea.hidden = true;
+      collapseHint();
       const correct = index === item.answer;
       if (correct) score += 10;
       ui.score.textContent = score;
@@ -1068,7 +1162,7 @@
       ui.partner.textContent = "10개의 미션 완수! 함께해서 즐거웠어. 우주에는 아직 발견할 이야기가 아주 많아!";
       const review = document.getElementById("review");
       review.replaceChildren();
-      questions.forEach((item, index) => {
+      questionOrder.forEach((item, index) => {
         const entry = document.createElement("li");
         const heading = document.createElement("strong");
         heading.textContent = `${selections[index] === item.answer ? "✓ 정답" : "✕ 오답"} · ${item.question}`;
@@ -1081,6 +1175,17 @@
       });
       document.getElementById("result-title").focus();
     }
+    ui.hintToggle.addEventListener("click", () => {
+      const expanded = ui.hintToggle.getAttribute("aria-expanded") === "true";
+      ui.hintToggle.setAttribute("aria-expanded", String(!expanded));
+      ui.hintToggle.textContent = expanded ? "루미의 힌트 보기" : "루미의 힌트 접기";
+      ui.hintPanel.hidden = expanded;
+    });
+    ui.shuffle.addEventListener("change", () => {
+      if (selections.length > 0) return;
+      questionOrder = createQuestionOrder();
+      renderQuestion();
+    });
     ui.next.addEventListener("click", () => {
       if (selections.length !== current + 1) return;
       if (current === questions.length - 1) showResults();
@@ -1090,6 +1195,9 @@
       current = 0;
       score = 0;
       selections = [];
+      questionOrder = createQuestionOrder();
+      ui.shuffle.disabled = false;
+      ui.shuffleNote.textContent = "첫 답변 전에만 바꿀 수 있어요. 다시 시작해도 선택한 설정은 유지돼요.";
       ui.score.textContent = "0";
       ui.progress.value = 0;
       ui.progress.textContent = "0 / 10";
@@ -1097,6 +1205,7 @@
       ui.results.hidden = true;
       ui.questionScreen.hidden = false;
       document.getElementById("review-details").open = false;
+      document.getElementById("review").replaceChildren();
       ui.partner.textContent = "다시 만나서 반가워! 새로운 마음으로 우주 탐험을 시작해 보자.";
       renderQuestion(true);
     });
